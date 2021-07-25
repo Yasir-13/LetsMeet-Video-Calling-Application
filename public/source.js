@@ -63,6 +63,12 @@ const ice = {
             {url:'stun:stun.voiparound.com'},
             {url:'stun:stun.voipbuster.com'},
             {url:'stun:stun.voipstunt.com'},
+            {url: "stun:stun.services.mozilla.com"},
+            {url: "stun:stun.l.google.com:19302"},
+            {url: "stun:stun1.l.google.com:19302"},
+            {url: "stun:stun3.l.google.com:19302"},
+            {url: "stun:stun4.l.google.com:19302"},
+            {url: "stun:stun.ekiga.net"},
     ]
 }
 
@@ -207,10 +213,20 @@ function iceCandidateFunction(event) {
     }
 }
  
-function onTrackFunction (event) {
+async function onTrackFunction  (event) {
     secVideo.srcObject = event.streams[0];
-    secVideo.play();
-}
+    const playVideo = await secVideo.play();
+    if (playVideo !== undefined)
+ {
+     playVideo.then(_  => {
+         console.log("video is playing now");
+         secVideo.pause(); 
+     })
+
+     .catch (error => {
+         console.log("video interrupted");
+     });
+ }}
 
 
 send.addEventListener("click" , (e)=> {
