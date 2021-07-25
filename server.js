@@ -3,6 +3,7 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
+const port = process.env.PORT  ||  3010 ; 
 
  app.set("view engine" , "ejs");
 app.use(express.static("public"));
@@ -100,7 +101,7 @@ io.of("/").on ("connection" , (socket) =>{
  }) 
 
 
-server.listen(3010 , ()=>{
+server.listen(port , ()=>{
     console.log("server has started running");
 });
 
