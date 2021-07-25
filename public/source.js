@@ -68,6 +68,7 @@ const ice = {
             {url: "stun:stun1.l.google.com:19302"},
             {url: "stun:stun3.l.google.com:19302"},
             {url: "stun:stun4.l.google.com:19302"},
+            {"urls":"turn:numb.viagenie.ca", "username":"webrtc@live.com", "credential":"muazkh"},
             {url: "stun:stun.ekiga.net"},
     ]
 }
@@ -104,7 +105,8 @@ socket.on("display-typing" , function(text) {
 
 })
 
-
+// const getMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia ||
+//                                 navigator.mediaDevices.mozGetUserMedia;
 
 
 socket.on("full" , function() {
