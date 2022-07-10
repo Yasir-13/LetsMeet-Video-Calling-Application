@@ -164,7 +164,7 @@ html{
 }
 
 #bottom::placeholder{
-    color: white;
+    /* color: white; */
     letter-spacing: 1px;
 }
 
@@ -194,14 +194,16 @@ html{
 
 #myVideo {
     max-height: 100%;
-     width: 90%; 
+     width: 100%; 
     max-width: 100%;
-    margin-left : 15%;
+    margin-left : 5%;
+    border: white 1px solid;
 }
 #secVideo {
-    width: 50%;
-    margin-left : 30%;
-    margin-top: 15px;
+    width: 60%;
+    margin-left : 20%;
+    margin-top: 8px;
+    border: whitesmoke 1px solid ;
     /* display: none;  */
 }
 
@@ -228,7 +230,7 @@ letter-spacing: 2px;
 }
 
 #joinButton:hover,#sub:hover {
-    transform: scaleX(1.07);
+    transform: scale(1.07);
 }
 
 #vidIcon {
@@ -240,7 +242,17 @@ letter-spacing: 2px;
     transform: scale(1.2);
 }
 
-
+#screen {
+    font-size : 30px;
+    color: white;
+    margin-left: 120px;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: 300ms transform 100ms;
+}
+#screen:hover{
+    transform: scale(1.2);
+}
 
 #errColor {
     font-size: 18px;

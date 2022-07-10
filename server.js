@@ -79,12 +79,21 @@ io.of("/").on ("connection" , (socket) =>{
             socket.to(roomVal).broadcast.emit("ready");
         })
 
+        socket.on("initiate" , function(roomVal){
+            console.log("initiate is entered");
+            io.emit("initiate");
+        })
+
         socket.on("candidate" , function(candidate , roomVal) {
             socket.to(roomVal).broadcast.emit("candidate" , candidate)
         })
 
         socket.on("offer" , function(offer) {
             socket.to(offer.roomVal).broadcast.emit("offer" , offer );
+        })
+
+        socket.on("offers" , function(offer){
+            socket.to(offer.roomVal).broadcast.emit("offers" , offer );
         })
 
         socket.on("answer" , function(answer) {

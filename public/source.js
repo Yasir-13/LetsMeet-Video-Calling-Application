@@ -18,8 +18,10 @@ const body = document.querySelector("body");
 const border = document.querySelector("#bdr");
 let creator = false;
 let userStream;
+let screenStream;
 let rtcPeerConnection;
 let userVal;
+let screenShare;
 
 userSub.addEventListener("click" , function(event) {
     if(!form.checkValidity()) {
@@ -107,7 +109,8 @@ socket.on("display-typing" , function(text) {
 
 // const getMedia = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia ||
 //                                 navigator.mediaDevices.mozGetUserMedia;
-
+ const screen = document.querySelector("#screen");
+ 
 
 socket.on("full" , function() {
      console.log("room is full");
@@ -129,8 +132,25 @@ socket.on("full" , function() {
                         userStream = stream;
                         myVideo.srcObject = stream;
                         myVideo.play();
-         })       
-})
+         });       
+         screen.addEventListener("click" , async(e) => {
+             screenShare = true;
+            const stream = await navigator.mediaDevices.getDisplayMedia({
+             video: {
+                 mediaSource: "screen",
+                 width: { max: '1920' },
+                 height: { max: '1080' },
+                 frameRate: { max: '10' }
+               }
+              
+            })
+            screenStream = stream;
+            myVideo.srcObject = stream;
+            myVideo.play();
+            // socket.emit("initiate" , roomVal);
+         });
+        });
+
 
 socket.on("joined" , function() {
     creator = false;
@@ -150,7 +170,21 @@ socket.on("joined" , function() {
                 myVideo.play();
                 socket.emit("ready" , roomVal);
  })
-     
+ screen.addEventListener("click" , async(e) => {
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+     video: {
+         mediaSource: "screen",
+         width: { max: '1920' },
+         height: { max: '1080' },
+         frameRate: { max: '10' }
+       }
+      
+    })
+    screenStream = stream;
+    myVideo.srcObject = stream;
+    myVideo.play();
+    socket.emit("initiate" , roomVal);
+ });
 })
 
 socket.on("ready" , function() {
@@ -175,6 +209,29 @@ socket.on("ready" , function() {
 }
 })
 
+socket.on("initiate" , function(){
+    console.log("entered initiate");
+    if(!creator) {
+        rtcPeerConnection = new RTCPeerConnection(ice);
+        rtcPeerConnection.onicecandidate = iceCandidateFunction;
+        rtcPeerConnection.ontrack = onTrackFunction;
+        rtcPeerConnection.addTrack(screenStream.getTracks()[0] , screenStream);
+        // // rtcPeerConnection.addTrack(screenStream.getTracks()[1] , screenStream);
+        rtcPeerConnection.createOffer()
+        .then((offer) => {
+          rtcPeerConnection.setLocalDescription(offer);
+          socket.emit("offers", {
+              type: "offer",
+              sdp : offer,
+              roomVal
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+})
+
 socket.on("candidate" , function(candidate) {
     let icecandidate = new RTCIceCandidate(candidate);
     rtcPeerConnection.addIceCandidate(icecandidate);
@@ -188,6 +245,30 @@ socket.on("offer" , function(offer) {
         rtcPeerConnection.ontrack = onTrackFunction;
         rtcPeerConnection.addTrack(userStream.getTracks()[0] , userStream);
         rtcPeerConnection.addTrack(userStream.getTracks()[1] , userStream);
+        rtcPeerConnection.setRemoteDescription(offer.sdp);
+        rtcPeerConnection.createAnswer()
+        .then((answer) => {
+          rtcPeerConnection.setLocalDescription(answer);
+          socket.emit("answer", {
+              type: "answer",
+              sdp : answer,
+              roomVal
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+})
+
+socket.on("offers" , function(offer){
+    if(creator) {
+        console.log("entered");
+        rtcPeerConnection = new RTCPeerConnection(ice);
+        rtcPeerConnection.onicecandidate = iceCandidateFunction;
+        rtcPeerConnection.ontrack = onTrackFunction;
+        // rtcPeerConnection.addTrack(screenStream.getTracks()[0] , screenStream);
+        // rtcPeerConnection.addTrack(screenStream.getTracks()[1] , screenStream);
         rtcPeerConnection.setRemoteDescription(offer.sdp);
         rtcPeerConnection.createAnswer()
         .then((answer) => {
